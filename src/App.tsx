@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { db } from '../service/firebase-config'
 
@@ -26,6 +26,11 @@ export function App() {
     })
 
     console.log(user)
+  }
+
+  async function deleteUser(id: string) {
+    const user = doc(db, "users", id)
+    await deleteDoc(user)
   }
 
   useEffect(() => {
@@ -73,7 +78,8 @@ export function App() {
               <li>{user.name}</li>
               <li>{user.email}</li>
               <li>{user.age}</li>
-              <br />
+              <button onClick={() => deleteUser(user.id)}>Remover</button>
+              <br /><br />
             </div>
           )
         })}
