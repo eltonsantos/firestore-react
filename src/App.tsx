@@ -20,7 +20,6 @@ export function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
-  // const [user, setUser] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isUpdate, setIsUpdate] = useState(false);
   const [tempId, setTempId] = useState("");
@@ -48,7 +47,6 @@ export function App() {
     setName(user.name);
     setEmail(user.email);
     setAge(user.age);
-    console.log(user.id);
   }
 
   async function handleSubmitChange() {
@@ -63,15 +61,13 @@ export function App() {
     setName("");
     setEmail("");
     setAge("");
-
-    console.log(user);
   }
 
   useEffect(() => {
     const getUsers = async () => {
       const data = await getDocs(userCollectionRef);
       setUsers(
-        data.docs.map((doc) => ({
+        data.docs.map((doc: any) => ({
           ...doc.data(),
           id: doc.id,
         }))
@@ -124,7 +120,7 @@ export function App() {
       <hr />
 
       <ul>
-        {users.map((user) => {
+        {users.map((user: User) => {
           return (
             <div key={user.id}>
               <li>{user.name}</li>
