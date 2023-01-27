@@ -1,6 +1,13 @@
-import { addDoc, collection, deleteDoc, doc, getDocs } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
-import { db } from '../service/firebase-config'
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "../service/firebase-config";
 
 interface User {
   id: string;
@@ -10,40 +17,67 @@ interface User {
 }
 
 export function App() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [tempId, setTempId] = useState("");
 
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [age, setAge] = useState('')
-  const [users, setUsers] = useState<User[]>([])
-
-  const userCollectionRef = collection(db, 'users')
+  const userCollectionRef = collection(db, "users");
 
   async function createUser() {
     const user = await addDoc(userCollectionRef, {
       name,
       email,
-      age
-    })
+      age,
+    });
 
-    console.log(user)
+    console.log(user);
   }
 
   async function deleteUser(id: string) {
-    const user = doc(db, "users", id)
-    await deleteDoc(user)
+    const user = doc(db, "users", id);
+    await deleteDoc(user);
+  }
+
+  async function updateUser(
+    id: string,
+    name: string,
+    email: string,
+    age: string
+  ) {
+    setIsUpdate(true);
+    setTempId(id);
+    setName(name);
+    setEmail(email);
+    setAge(age);
+  }
+
+  async function handleSubmitChange(id: string) {
+    const user = doc(db, "users", id);
+    await updateDoc(user, {
+      name,
+      email,
+      age,
+    });
+
+    console.log(user);
   }
 
   useEffect(() => {
     const getUsers = async () => {
-      const data = await getDocs(userCollectionRef)
-      setUsers(data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id
-      })))
-    }
+      const data = await getDocs(userCollectionRef);
+      setUsers(
+        data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    };
 
-    getUsers()
-  }, [])
+    getUsers();
+  }, []);
 
   return (
     <>
@@ -67,7 +101,23 @@ export function App() {
         value={age}
         onChange={(e) => setAge(e.target.value)}
       />
-      <button onClick={createUser}>Cadastrar</button>
+      {isUpdate ? (
+        <>
+          <button onClick={handleSubmitChange}>Atualizar</button>
+          <button
+            onClick={() => {
+              setIsUpdate(false);
+              setName("");
+              setEmail("");
+              setAge("");
+            }}
+          >
+            Cancelar
+          </button>
+        </>
+      ) : (
+        <button onClick={createUser}>Cadastrar</button>
+      )}
 
       <hr />
 
@@ -79,11 +129,13 @@ export function App() {
               <li>{user.email}</li>
               <li>{user.age}</li>
               <button onClick={() => deleteUser(user.id)}>Remover</button>
-              <br /><br />
+              <button onClick={() => updateUser(user.id)}>Update</button>
+              <br />
+              <br />
             </div>
-          )
+          );
         })}
       </ul>
     </>
-  )
+  );
 }
