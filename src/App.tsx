@@ -20,6 +20,7 @@ export function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
+  // const [user, setUser] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isUpdate, setIsUpdate] = useState(false);
   const [tempId, setTempId] = useState("");
@@ -41,26 +42,27 @@ export function App() {
     await deleteDoc(user);
   }
 
-  async function updateUser(
-    id: string,
-    name: string,
-    email: string,
-    age: string
-  ) {
+  async function updateUser(user: User) {
     setIsUpdate(true);
-    setTempId(id);
-    setName(name);
-    setEmail(email);
-    setAge(age);
+    setTempId(user.id);
+    setName(user.name);
+    setEmail(user.email);
+    setAge(user.age);
+    console.log(user.id);
   }
 
-  async function handleSubmitChange(id: string) {
-    const user = doc(db, "users", id);
+  async function handleSubmitChange() {
+    const user = doc(db, "users", tempId);
     await updateDoc(user, {
       name,
       email,
       age,
+      id: tempId,
     });
+
+    setName("");
+    setEmail("");
+    setAge("");
 
     console.log(user);
   }
@@ -129,7 +131,7 @@ export function App() {
               <li>{user.email}</li>
               <li>{user.age}</li>
               <button onClick={() => deleteUser(user.id)}>Remover</button>
-              <button onClick={() => updateUser(user.id)}>Update</button>
+              <button onClick={() => updateUser(user)}>Update</button>
               <br />
               <br />
             </div>
